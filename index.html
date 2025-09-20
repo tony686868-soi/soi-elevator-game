@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thang Máy Học Chữ Cái</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
+
+        .elevator-container {
+            position: relative;
+            width: 600px;
+            height: 500px;
+            background: #2c3e50;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+            overflow: hidden;
+            display: flex;
+        }
+
+        /* Màn hình hiển thị tầng */
+        .floor-display {
+            position: absolute;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 120px;
+            height: 60px;
+            background: #000;
+            border: 3px solid #34495e;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #00ff00;
+            font-size: 24px;
+            font-weight: bold;
+            font-family: 'Courier New', monospace;
+            z-index: 10;
+        }
+
+        .floor-number {
+            margin-right: 10px;
+        }
+
+        .direction-arrow {
+            font-size: 16px;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .direction-arrow.up {
+            opacity: 1;
+            color: #00ff00;
+        }
+
+        .direction-arrow.down {
+            opacity: 1;
+            color: #ff6b6b;
+        }
+
+        /* Cửa thang máy - giữa */
+        .elevator-doors {
+            position: absolute;
+            top: 100px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 300px;
+            height: 350px;
+            background: #34495e;
+            border-radius: 10px;
+            overflow: hidden;
+            z-index: 1;
+        }
+
+        .door {
+            position: absolute;
+            top: 0;
+            width: 150px;
+            height: 100%;
+            background: linear-gradient(90deg, #3498db, #2980b9);
+            transition: transform 0.8s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 2px solid #2980b9;
+        }
+
+        .door-left {
+            left: 0;
+            border-right: 1px solid #2980b9;
+        }
+
+        .door-right {
+            right: 0;
+            border-left: 1px solid #2980b9;
+        }
+
+        .doors-opening .door-left {
+            transform: translateX(-100%);
+        }
+
+        .doors-opening .door-right {
+            transform: translateX(100%);
+        }
+
+        /* Nội dung bên trong thang máy */
+        .elevator-content {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #ecf0f1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 48px;
+            font-weight: bold;
+            color: #2c3e50;
+            opacity: 0;
+            transition: opacity 0.5s ease 0.8s;
+        }
+
+        .doors-opening .elevator-content {
+            opacity: 1;
+        }
+
+        /* Bảng điều khiển - bên phải */
+        .control-panel {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 180px;
+            height: 450px;
+            background: #34495e;
+            border-radius: 15px;
+            padding: 15px;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            grid-template-rows: repeat(10, 1fr);
+            gap: 6px;
+            overflow-y: auto;
+        }
+
+        .floor-button {
+            width: 100%;
+            height: 35px;
+            border: none;
+            border-radius: 6px;
+            background: linear-gradient(145deg, #4a5f7a, #34495e);
+            color: white;
+            font-weight: bold;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+            box-shadow: 0 3px 6px rgba(0,0,0,0.2);
+        }
+
+        .floor-button:hover {
+            background: linear-gradient(145deg, #5a6f8a, #44596e);
+            transform: translateY(-2px);
+        }
+
+        .floor-button:active {
+            transform: translateY(0);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .floor-button.selected {
+            background: linear-gradient(145deg, #e74c3c, #c0392b);
+            box-shadow: 0 0 15px rgba(231, 76, 60, 0.5);
+        }
+
+        .control-button {
+            grid-column: span 3;
+            height: 35px;
+            border: none;
+            border-radius: 6px;
+            font-weight: bold;
+            font-size: 11px;
+            cursor: pointer;
+            transition: all 0.2s;
+            box-shadow: 0 3px 6px rgba(0,0,0,0.2);
+        }
+
+        .open-door {
+            background: linear-gradient(145deg, #27ae60, #229954);
+            color: white;
+        }
+
+        .close-door {
+            background: linear-gradient(145deg, #e67e22, #d35400);
+            color: white;
+        }
+
+        .emergency {
+            background: linear-gradient(145deg, #e74c3c, #c0392b);
+            color: white;
+            grid-column: span 3;
+            font-size: 10px;
+        }
+
+        .control-button:hover {
+            transform: translateY(-2px);
+        }
+
+        .control-button:active {
+            transform: translateY(0);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+
+        /* Hiệu ứng di chuyển */
+        .elevator-container.moving {
+            animation: shake 0.1s infinite alternate;
+        }
+
+        @keyframes shake {
+            0% { transform: translateY(0px); }
+            100% { transform: translateY(2px); }
+        }
+
+        /* Âm thanh loading */
+        .sound-indicator {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: rgba(0,0,0,0.7);
+            color: white;
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-size: 12px;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .sound-indicator.active {
+            opacity: 1;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .elevator-container {
+                width: 95vw;
+                height: 70vh;
+                flex-direction: column;
+            }
+            
+            .control-panel {
+                position: relative;
+                right: auto;
+                top: auto;
+                transform: none;
+                width: 100%;
+                height: 200px;
+                grid-template-columns: repeat(6, 1fr);
+                grid-template-rows: repeat(5, 1fr);
+                margin-top: 10px;
+            }
+
+            .elevator-doors {
+                width: 250px;
+                height: 250px;
+            }
+
+            .control-button {
+                grid-column: span 2;
+            }
+
+            .emergency {
+                grid-column: span 6;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="elevator-container" id="elevator">
+        <div class="sound-indicator" id="soundIndicator">🔊 Âm thanh</div>
+        
+        <div class="floor-display">
+            <span class="floor-number" id="floorNumber">1</span>
+            <span class="direction-arrow" id="directionArrow">▲</span>
+        </div>
+
+        <div class="elevator-doors" id="elevatorDoors">
+            <div class="door door-left"></div>
+            <div class="door door-right"></div>
+            <div class="elevator-content" id="elevatorContent">A</div>
+        </div>
+
+        <div class="control-panel">
+            <!-- Nút tầng 1-24 -->
+            <button class="floor-button selected" data-floor="1">1</button>
+            <button class="floor-button" data-floor="2">2</button>
+            <button class="floor-button" data-floor="3">3</button>
+            <button class="floor-button" data-floor="4">4</button>
+            <button class="floor-button" data-floor="5">5</button>
+            <button class="floor-button" data-floor="6">6</button>
+            <button class="floor-button" data-floor="7">7</button>
+            <button class="floor-button" data-floor="8">8</button>
+            <button class="floor-button" data-floor="9">9</button>
+            <button class="floor-button" data-floor="10">10</button>
+            <button class="floor-button" data-floor="11">11</button>
+            <button class="floor-button" data-floor="12">12</button>
+            <button class="floor-button" data-floor="13">13</button>
+            <button class="floor-button" data-floor="14">14</button>
+            <button class="floor-button" data-floor="15">15</button>
+            <button class="floor-button" data-floor="16">16</button>
+            <button class="floor-button" data-floor="17">17</button>
+            <button class="floor-button" data-floor="18">18</button>
+            <button class="floor-button" data-floor="19">19</button>
+            <button class="floor-button" data-floor="20">20</button>
+            <button class="floor-button" data-floor="21">21</button>
+            <button class="floor-button" data-floor="22">22</button>
+            <button class="floor-button" data-floor="23">23</button>
+            <button class="floor-button" data-floor="24">24</button>
+
+            <!-- Nút điều khiển -->
+            <button class="control-button open-door" id="openDoor">MỞ CỬA</button>
+            <button class="control-button close-door" id="closeDoor">ĐÓNG CỬA</button>
+            <button class="control-button emergency" id="emergency">🚨 KHẨN CẤP 🚨</button>
+        </div>
+    </div>
+
+    <script>
+        // Bảng chữ cái tiếng Việt (29 chữ cái)
+        const vietnameseAlphabet = [
+            'A', 'Ă', 'Â', 'B', 'C', 'D', 'Đ', 'E', 'Ê', 'G', 
+            'H', 'I', 'K', 'L', 'M', 'N', 'O', 'Ô', 'Ơ', 'P', 
+            'Q', 'R', 'S', 'T', 'U', 'Ư', 'V', 'X', 'Y'
+        ];
+
+        // Trạng thái thang máy
+        let currentFloor = 1;
+        let targetFloor = 1;
+        let isMoving = false;
+        let doorsOpen = false;
+
+        // Elements
+        const elevator = document.getElementById('elevator');
+        const floorNumber = document.getElementById('floorNumber');
+        const directionArrow = document.getElementById('directionArrow');
+        const elevatorDoors = document.getElementById('elevatorDoors');
+        const elevatorContent = document.getElementById('elevatorContent');
+        const soundIndicator = document.getElementById('soundIndicator');
+        const floorButtons = document.querySelectorAll('.floor-button');
+        const openDoorBtn = document.getElementById('openDoor');
+        const closeDoorBtn = document.getElementById('closeDoor');
+        const emergencyBtn = document.getElementById('emergency');
+
+        // Âm thanh
+        function playSound(type) {
+            soundIndicator.classList.add('active');
+            
+            if (type === 'ding') {
+                // Tạo âm thanh ding
+                const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                const oscillator = audioContext.createOscillator();
+                const gainNode = audioContext.createGain();
+                
+                oscillator.connect(gainNode);
+                gainNode.connect(audioContext.destination);
+                
+                oscillator.frequency.setValueAtTime(800, audioContext.currentTime);
+                oscillator.frequency.setValueAtTime(600, audioContext.currentTime + 0.1);
+                
+                gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.5);
+                
+                oscillator.start(audioContext.currentTime);
+                oscillator.stop(audioContext.currentTime + 0.5);
+            }
+            
+            setTimeout(() => {
+                soundIndicator.classList.remove('active');
+            }, 1000);
+        }
+
+        // Cập nhật hiển thị tầng
+        function updateFloorDisplay() {
+            floorNumber.textContent = currentFloor;
+            elevatorContent.textContent = vietnameseAlphabet[currentFloor - 1] || '?';
+        }
+
+        // Hiển thị mũi tên hướng
+        function showDirection(direction) {
+            directionArrow.className = 'direction-arrow';
+            if (direction === 'up') {
+                directionArrow.className += ' up';
+                directionArrow.textContent = '▲';
+            } else if (direction === 'down') {
+                directionArrow.className += ' down';
+                directionArrow.textContent = '▼';
+            }
+        }
+
+        // Ẩn mũi tên
+        function hideDirection() {
+            directionArrow.className = 'direction-arrow';
+        }
+
+        // Di chuyển thang máy
+        function moveElevator() {
+            if (currentFloor === targetFloor || isMoving) return;
+
+            isMoving = true;
+            elevator.classList.add('moving');
+
+            const direction = currentFloor < targetFloor ? 'up' : 'down';
+            showDirection(direction);
+
+            const moveInterval = setInterval(() => {
+                if (direction === 'up') {
+                    currentFloor++;
+                } else {
+                    currentFloor--;
+                }
+
+                updateFloorDisplay();
+
+                if (currentFloor === targetFloor) {
+                    clearInterval(moveInterval);
+                    elevator.classList.remove('moving');
+                    hideDirection();
+                    isMoving = false;
+                    playSound('ding');
+                }
+            }, 800);
+        }
+
+        // Đóng cửa
+        function closeDoors() {
+            if (!doorsOpen) return;
+            
+            elevatorDoors.classList.remove('doors-opening');
+            doorsOpen = false;
+            
+            // Sau khi đóng cửa, bắt đầu di chuyển
+            setTimeout(() => {
+                moveElevator();
+            }, 800);
+        }
+
+        // Mở cửa
+        function openDoors() {
+            if (doorsOpen || isMoving) return;
+            
+            elevatorDoors.classList.add('doors-opening');
+            doorsOpen = true;
+        }
+
+        // Xử lý nút tầng
+        floorButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                if (isMoving) return;
+
+                const floor = parseInt(button.dataset.floor);
+                
+                // Bỏ chọn tầng cũ
+                floorButtons.forEach(btn => btn.classList.remove('selected'));
+                
+                // Chọn tầng mới
+                button.classList.add('selected');
+                targetFloor = floor;
+            });
+        });
+
+        // Xử lý nút đóng cửa
+        closeDoorBtn.addEventListener('click', () => {
+            if (!isMoving && doorsOpen) {
+                closeDoors();
+            }
+        });
+
+        // Xử lý nút mở cửa
+        openDoorBtn.addEventListener('click', () => {
+            if (!isMoving && !doorsOpen) {
+                openDoors();
+            }
+        });
+
+        // Xử lý nút khẩn cấp
+        emergencyBtn.addEventListener('click', () => {
+            alert('🚨 Chuông khẩn cấp đã được kích hoạt!\n📞 Đang liên hệ bảo vệ...');
+            playSound('emergency');
+        });
+
+        // Khởi tạo
+        function init() {
+            updateFloorDisplay();
+            openDoors(); // Mở cửa ban đầu
+        }
+
+        // Bắt đầu game
+        init();
+    </script>
+</body>
+</html>
