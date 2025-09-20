@@ -23,13 +23,12 @@
 
         .elevator-container {
             position: relative;
-            width: 600px;
-            height: 500px;
+            width: 800px;
+            height: 600px;
             background: #2c3e50;
             border-radius: 15px;
             box-shadow: 0 20px 40px rgba(0,0,0,0.3);
             overflow: hidden;
-            display: flex;
         }
 
         /* Màn hình hiển thị tầng */
@@ -50,7 +49,6 @@
             font-size: 24px;
             font-weight: bold;
             font-family: 'Courier New', monospace;
-            z-index: 10;
         }
 
         .floor-number {
@@ -73,24 +71,22 @@
             color: #ff6b6b;
         }
 
-        /* Cửa thang máy - giữa */
+        /* Cửa thang máy */
         .elevator-doors {
             position: absolute;
             top: 100px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 300px;
-            height: 350px;
+            left: 100px;
+            width: 350px;
+            height: 400px;
             background: #34495e;
             border-radius: 10px;
             overflow: hidden;
-            z-index: 1;
         }
 
         .door {
             position: absolute;
             top: 0;
-            width: 150px;
+            width: 175px;
             height: 100%;
             background: linear-gradient(90deg, #3498db, #2980b9);
             transition: transform 0.8s ease;
@@ -129,7 +125,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 48px;
+            font-size: 72px;
             font-weight: bold;
             color: #2c3e50;
             opacity: 0;
@@ -140,36 +136,33 @@
             opacity: 1;
         }
 
-        /* Bảng điều khiển - bên phải */
+        /* Bảng điều khiển */
         .control-panel {
             position: absolute;
-            right: 10px;
-            top: 50%;
-            transform: translateY(-50%);
-            width: 180px;
-            height: 450px;
+            right: 20px;
+            top: 50px;
+            width: 240px;
+            height: 500px;
             background: #34495e;
             border-radius: 15px;
-            padding: 15px;
+            padding: 20px;
             display: grid;
             grid-template-columns: repeat(3, 1fr);
-            grid-template-rows: repeat(10, 1fr);
-            gap: 6px;
+            gap: 8px;
             overflow-y: auto;
         }
 
         .floor-button {
             width: 100%;
-            height: 35px;
+            height: 40px;
             border: none;
-            border-radius: 6px;
+            border-radius: 8px;
             background: linear-gradient(145deg, #4a5f7a, #34495e);
             color: white;
             font-weight: bold;
-            font-size: 12px;
             cursor: pointer;
             transition: all 0.2s;
-            box-shadow: 0 3px 6px rgba(0,0,0,0.2);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
         }
 
         .floor-button:hover {
@@ -189,14 +182,14 @@
 
         .control-button {
             grid-column: span 3;
-            height: 35px;
+            height: 45px;
             border: none;
-            border-radius: 6px;
+            border-radius: 8px;
             font-weight: bold;
-            font-size: 11px;
             cursor: pointer;
             transition: all 0.2s;
-            box-shadow: 0 3px 6px rgba(0,0,0,0.2);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            margin-top: 10px;
         }
 
         .open-door {
@@ -212,8 +205,6 @@
         .emergency {
             background: linear-gradient(145deg, #e74c3c, #c0392b);
             color: white;
-            grid-column: span 3;
-            font-size: 10px;
         }
 
         .control-button:hover {
@@ -254,32 +245,31 @@
         }
 
         /* Responsive */
-        @media (max-width: 768px) {
+        @media (max-width: 900px) {
             .elevator-container {
                 width: 95vw;
-                height: 70vh;
-                flex-direction: column;
+                height: 90vh;
             }
             
             .control-panel {
-                position: relative;
-                right: auto;
-                top: auto;
-                transform: none;
-                width: 100%;
-                height: 200px;
+                width: 90%;
+                right: 5%;
                 grid-template-columns: repeat(6, 1fr);
-                grid-template-rows: repeat(5, 1fr);
-                margin-top: 10px;
+                height: 200px;
+                top: auto;
+                bottom: 20px;
             }
 
             .elevator-doors {
-                width: 250px;
-                height: 250px;
+                left: 50%;
+                transform: translateX(-50%);
+                width: 300px;
+                height: 300px;
             }
 
             .control-button {
                 grid-column: span 2;
+                margin-top: 5px;
             }
 
             .emergency {
@@ -304,7 +294,7 @@
         </div>
 
         <div class="control-panel">
-            <!-- Nút tầng 1-24 -->
+            <!-- Nút tầng 1-29 -->
             <button class="floor-button selected" data-floor="1">1</button>
             <button class="floor-button" data-floor="2">2</button>
             <button class="floor-button" data-floor="3">3</button>
@@ -329,6 +319,11 @@
             <button class="floor-button" data-floor="22">22</button>
             <button class="floor-button" data-floor="23">23</button>
             <button class="floor-button" data-floor="24">24</button>
+            <button class="floor-button" data-floor="25">25</button>
+            <button class="floor-button" data-floor="26">26</button>
+            <button class="floor-button" data-floor="27">27</button>
+            <button class="floor-button" data-floor="28">28</button>
+            <button class="floor-button" data-floor="29">29</button>
 
             <!-- Nút điều khiển -->
             <button class="control-button open-door" id="openDoor">MỞ CỬA</button>
